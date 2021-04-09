@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const thingSchema = mongoose.Schema({
-  //sauce: { type: Object, required: true },
   name: { type: String, required: true },
   manufacturer: { type: String, required: true },
   description: { type: String, required: true },
