@@ -24,8 +24,9 @@ exports.getOneThing = (req, res, next) => {
       res.status(200).json(thing);
     })
     .catch((error) => {
+      // invalid sauce:id
       res.status(404).json({
-        error: error,
+        error: "Cette sauce n'existe pas",
       });
     });
 };

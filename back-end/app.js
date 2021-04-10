@@ -34,4 +34,9 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/sauces", saucesRoutes);
 app.use("/api/auth", userRoutes);
 
+// Toutes routes non déclaré
+app.use("*", (req, res) => {
+  res.json({ error: "la route n'existe pas" }); // res.sendStatus(404)
+});
+
 module.exports = app;
