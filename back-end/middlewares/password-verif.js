@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
         "content-type": "application/json",
       }
     );
-    res.end('{"message":"Mauvaise saisie !"}', {
+    res.end('{"message":"Mot de passe incorrect"}', {
       "content-type": "application/json",
     });
   } else {
