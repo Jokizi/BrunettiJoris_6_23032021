@@ -15,7 +15,7 @@ const thingSchema = mongoose.Schema({
     required: true,
     validate: sauceVerif.descriptionChecker,
   },
-  heat: { type: Number, required: true, validate: sauceVerif.heatChecker },
+  heat: { type: Number, required: true, min: 1, max: 10 },
   imageUrl: { type: String, required: true },
   likes: { type: Number },
   dislikes: { type: Number },

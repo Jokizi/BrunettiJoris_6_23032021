@@ -1,3 +1,5 @@
+// Utilisation du package : mongoose-validator pour vérifier les informations envoyés dans la création et la modification des sauces
+
 const validate = require("mongoose-validator");
 
 const regexValidate = /^[ A-Za-z0-9_@./'à#&+-]*$/i;
@@ -48,7 +50,7 @@ exports.descriptionChecker = [
 exports.ingredientChecker = [
   validate({
     validator: "isLength",
-    arguments: [2, 2],
+    arguments: [2, 200],
     message:
       "l'ingrédient du produit doit comporter entres 2 et 200 caractères",
   }),
@@ -57,18 +59,5 @@ exports.ingredientChecker = [
     arguments: regexValidate,
     message:
       "Vous pouvez utiliser des lettres, chiffres, majuscules, minuscules et caractères spéciaux",
-  }),
-];
-
-exports.heatChecker = [
-  validate({
-    validator: "isLength",
-    arguments: [1, 10],
-    message: "La notation va de 1 à 10",
-  }),
-  validate({
-    validator: "matches",
-    arguments: /^[1-10]+$/i,
-    message: "La notation va de 1 à 10",
   }),
 ];

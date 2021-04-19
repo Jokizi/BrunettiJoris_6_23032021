@@ -1,4 +1,5 @@
 const Thing = require("../models/thing");
+const jwt = require("jsonwebtoken");
 const fs = require("fs");
 
 exports.createThing = (req, res, next) => {
@@ -42,12 +43,18 @@ exports.modifyThing = (req, res, next) => {
         }`,
       }
     : { ...req.body };
+  const runValidSauce = {
+    runValidators: true, // fait run sauceVerif dans la modification
+  };
   Thing.updateOne(
     { _id: req.params.id },
-    { ...thingObject, _id: req.params.id }
+    { ...thingObject, _id: req.params.id },
+    runValidSauce
   )
     .then(() => res.status(200).json({ message: "Objet modifié !" }))
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) =>
+      res.status(400).json({ error: "La sauce n'a pas été modifié" })
+    );
 };
 
 exports.deleteThing = (req, res, next) => {
