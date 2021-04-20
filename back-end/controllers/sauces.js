@@ -34,8 +34,58 @@ exports.getOneThing = (req, res, next) => {
     });
 };
 
-exports.modifyThing = (req, res, next) => {
-  const thingObject = req.file
+exports.modifyThing = async (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const decodedToken = jwt.verify(token, process.env.TOKEN);
+  const userId = decodedToken.userId;
+
+  try {
+    const checkSauce = await Thing.findOne({
+      _id: req.params.id,
+    });
+    req.body.likes = checkSauce.likes;
+
+    if (checkSauce) {
+      if (userId === checkSauce.userId) {
+        const thingObject = req.file
+          ? (Thing.findOne({
+              _id: req.params.id,
+            }).then((sauce) => {
+              const filename = sauce.imageUrl.split("/images/")[1];
+              fs.unlinkSync(`images/${filename}`);
+            }),
+            {
+              ...JSON.parse(req.body.sauce),
+              imageUrl: `${req.protocol}://${req.get("host")}/images/${
+                req.file.filename
+              }`,
+            })
+          : { ...req.body };
+        const runValidSauce = {
+          runValidators: true, // fait run sauceVerif dans la modification
+        };
+        Thing.updateOne(
+          { _id: req.params.id },
+          { ...thingObject, _id: req.params.id },
+          runValidSauce
+        )
+          .then(() => res.status(200).json({ message: "Objet modifié !" }))
+          .catch((error) =>
+            res
+              .status(400)
+              .json({ error: "erreur la sauce n'a pas pu être modifié" })
+          );
+      } else {
+        res.status(400).json({ error: "Cette sauce ne vous appartient pas" });
+      }
+    } else {
+      res.status(400).json({ error: "Cette sauce n'éxiste pas" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: "Cette sauce n'éxiste pas" });
+  }
+
+  /*const thingObject = req.file
     ? {
         ...JSON.parse(req.body.sauce), // modifier l'image de la sauce
         imageUrl: `${req.protocol}://${req.get("host")}/images/${
@@ -54,20 +104,43 @@ exports.modifyThing = (req, res, next) => {
     .then(() => res.status(200).json({ message: "Objet modifié !" }))
     .catch((error) =>
       res.status(400).json({ error: "La sauce n'a pas été modifié" })
-    );
+    );*/
 };
 
-exports.deleteThing = (req, res, next) => {
-  Thing.findOne({ _id: req.params.id })
-    .then((thing) => {
-      const filename = thing.imageUrl.split("/images/")[1];
-      fs.unlink(`images/${filename}`, () => {
-        Thing.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: "Objet supprimé !" }))
-          .catch((error) => res.status(400).json({ error }));
-      });
-    })
-    .catch((error) => res.status(500).json({ error }));
+exports.deleteThing = async (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const decodedToken = jwt.verify(token, process.env.TOKEN);
+  const userId = decodedToken.userId;
+
+  try {
+    const checkSauce = await Thing.findOne({
+      _id: req.params.id,
+    });
+    req.body.likes = checkSauce.likes;
+
+    if (checkSauce) {
+      if (userId === checkSauce.userId) {
+        Thing.findOne({ _id: req.params.id })
+          .then((thing) => {
+            const filename = thing.imageUrl.split("/images/")[1];
+            fs.unlink(`images/${filename}`, () => {
+              Thing.deleteOne({ _id: req.params.id })
+                .then(() =>
+                  res.status(200).json({ message: "Objet supprimé !" })
+                )
+                .catch((error) => res.status(400).json({ error }));
+            });
+          })
+          .catch((error) => res.status(500).json({ error }));
+      } else {
+        res.status(400).json({ error: "Cette sauce ne vous appartient pas" });
+      }
+    } else {
+      res.status(400).json({ error: "Cette sauce n'éxiste pas" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: "Cette sauce n'éxiste pas" });
+  }
 };
 
 exports.getAllSauces = (req, res, next) => {

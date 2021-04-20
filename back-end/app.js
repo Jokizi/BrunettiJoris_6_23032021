@@ -6,11 +6,14 @@ const path = require("path");
 const Thing = require("./models/thing");
 const saucesRoutes = require("./routes/sauces");
 const userRoutes = require("./routes/user");
+require("dotenv").config();
+
 mongoose
-  .connect(
-    "mongodb+srv://Jokizi:boosterspirit123@cluster0.qnroh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.MONGOOSE, {
+    // lien avec fichier .env
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
