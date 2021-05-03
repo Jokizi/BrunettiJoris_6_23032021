@@ -155,6 +155,161 @@ exports.getAllSauces = (req, res, next) => {
     });
 };
 
+exports.likeDislike = async (req, res, next) => {
+  let { like, userId } = req.body;
+  let sauceId = req.params.id;
+
+  if (!userId || !sauceId) {
+    res.status(400).json({ message: "donné incomplete" });
+    return;
+  }
+  const thing = await Thing.findOne({
+    _id: sauceId,
+  });
+  if (like === 1) {
+    if (
+      thing.usersDisliked.includes(userId) &&
+      thing.usersLiked.includes(userId) === false
+    ) {
+      return res.status(400).json({
+        error: "action impossible",
+      });
+    }
+
+    if (thing.usersLiked.includes(userId) === false) {
+      try {
+        await Thing.updateOne(
+          {
+            _id: sauceId,
+          },
+          {
+            $push: {
+              usersLiked: userId,
+            },
+            $inc: {
+              likes: +1,
+            },
+          }
+        );
+        res.status(200).json({
+          message: "j aime ajouté !",
+        });
+      } catch (error) {
+        res.status(400).json({
+          error: "cette sauce éxiste pas",
+        });
+      }
+    } else {
+      res.status(400).json({
+        error: "vous avez déjà liker",
+      });
+    }
+  } else if (like === -1) {
+    const thing = await Thing.findOne({
+      _id: sauceId,
+    });
+    if (
+      thing.usersDisliked.includes(userId) === false &&
+      thing.usersLiked.includes(userId)
+    ) {
+      return res.status(400).json({
+        error: "action impossible",
+      });
+    }
+    if (thing.usersDisliked.includes(userId) === false) {
+      try {
+        await Thing.updateOne(
+          {
+            _id: sauceId,
+          },
+          {
+            $push: {
+              usersDisliked: userId,
+            },
+            $inc: {
+              dislikes: +1,
+            },
+          }
+        );
+        res.status(200).json({
+          message: "Dislike ajouté !",
+        });
+      } catch (error) {
+        res.status(400).json({
+          error: "cette sauce éxiste pas",
+        });
+      }
+    } else {
+      res.status(400).json({
+        error: "vous avez déjà disliker",
+      });
+    }
+  } else if (like === 0) {
+    try {
+      const thing = await Thing.findOne({
+        _id: sauceId,
+      });
+      if (thing.usersLiked.includes(userId)) {
+        try {
+          await Thing.updateOne(
+            {
+              _id: sauceId,
+            },
+            {
+              $pull: {
+                usersLiked: userId,
+              },
+              $inc: {
+                likes: -1,
+              },
+            }
+          );
+          res.status(200).json({
+            message: "Like retiré !",
+          });
+        } catch (error) {
+          res.status(400).json({
+            error: "cette sauce éxiste pas",
+          });
+        }
+      }
+      if (thing.usersDisliked.includes(userId)) {
+        try {
+          await Thing.updateOne(
+            {
+              _id: sauceId,
+            },
+            {
+              $pull: {
+                usersDisliked: userId,
+              },
+              $inc: {
+                dislikes: -1,
+              },
+            }
+          );
+          res.status(200).json({
+            message: "Dislike retiré !",
+          });
+        } catch (error) {
+          res.status(400).json({
+            error,
+          });
+        }
+      }
+    } catch (error) {
+      res.status(400).json({
+        error: "cette sauce éxiste pas",
+      });
+    }
+  } else {
+    res.status(400).json({
+      error: "cette sauce éxiste pas",
+    });
+  }
+};
+
+/*
 exports.likeDislike = (req, res, next) => {
   // Ajout/suppression d'un like et dislike à une sauce
   // Like présent dans le body
@@ -283,3 +438,4 @@ exports.likeDislike = (req, res, next) => {
       );
   }
 };
+*/
