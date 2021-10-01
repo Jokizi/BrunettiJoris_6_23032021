@@ -14,7 +14,7 @@ schema
   .has()
   .lowercase() // Avoir 1 minuscule
   .has()
-  .digits(2) // Avoir au minimum 2
+  .digits(2) // Avoir au minimum 2 chiffres
   .has()
   .not()
   .spaces() // Pas d'espace
