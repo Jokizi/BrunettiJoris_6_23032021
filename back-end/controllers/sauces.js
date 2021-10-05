@@ -7,9 +7,7 @@ exports.createThing = (req, res, next) => {
   delete thingObject._id;
   const thing = new Thing({
     ...thingObject,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
     likes: 0,
     dislikes: 0,
   });
@@ -56,25 +54,15 @@ exports.modifyThing = async (req, res, next) => {
             }),
             {
               ...JSON.parse(req.body.sauce),
-              imageUrl: `${req.protocol}://${req.get("host")}/images/${
-                req.file.filename
-              }`,
+              imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
             })
           : { ...req.body };
         const runValidSauce = {
           runValidators: true, // fait run sauceVerif dans la modification
         };
-        Thing.updateOne(
-          { _id: req.params.id },
-          { ...thingObject, _id: req.params.id },
-          runValidSauce
-        )
+        Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id }, runValidSauce)
           .then(() => res.status(200).json({ message: "Objet modifié !" }))
-          .catch((error) =>
-            res
-              .status(400)
-              .json({ error: "erreur la sauce n'a pas pu être modifié" })
-          );
+          .catch((error) => res.status(400).json({ error: "erreur la sauce n'a pas pu être modifié" }));
       } else {
         res.status(400).json({ error: "Cette sauce ne vous appartient pas" });
       }
@@ -125,9 +113,7 @@ exports.deleteThing = async (req, res, next) => {
             const filename = thing.imageUrl.split("/images/")[1];
             fs.unlink(`images/${filename}`, () => {
               Thing.deleteOne({ _id: req.params.id })
-                .then(() =>
-                  res.status(200).json({ message: "Objet supprimé !" })
-                )
+                .then(() => res.status(200).json({ message: "Objet supprimé !" }))
                 .catch((error) => res.status(400).json({ error }));
             });
           })
@@ -160,17 +146,14 @@ exports.likeDislike = async (req, res, next) => {
   let sauceId = req.params.id;
 
   if (!userId || !sauceId) {
-    res.status(400).json({ message: "donné incomplete" });
+    res.status(400).json({ message: "donnée incomplete" });
     return;
   }
   const thing = await Thing.findOne({
     _id: sauceId,
   });
   if (like === 1) {
-    if (
-      thing.usersDisliked.includes(userId) &&
-      thing.usersLiked.includes(userId) === false
-    ) {
+    if (thing.usersDisliked.includes(userId) && thing.usersLiked.includes(userId) === false) {
       return res.status(400).json({
         error: "action impossible",
       });
@@ -192,11 +175,11 @@ exports.likeDislike = async (req, res, next) => {
           }
         );
         res.status(200).json({
-          message: "j aime ajouté !",
+          message: "Like ajouté !",
         });
       } catch (error) {
         res.status(400).json({
-          error: "cette sauce éxiste pas",
+          error: "cette sauce n'éxiste pas",
         });
       }
     } else {
@@ -208,10 +191,7 @@ exports.likeDislike = async (req, res, next) => {
     const thing = await Thing.findOne({
       _id: sauceId,
     });
-    if (
-      thing.usersDisliked.includes(userId) === false &&
-      thing.usersLiked.includes(userId)
-    ) {
+    if (thing.usersDisliked.includes(userId) === false && thing.usersLiked.includes(userId)) {
       return res.status(400).json({
         error: "action impossible",
       });
@@ -236,7 +216,7 @@ exports.likeDislike = async (req, res, next) => {
         });
       } catch (error) {
         res.status(400).json({
-          error: "cette sauce éxiste pas",
+          error: "cette sauce n'éxiste pas",
         });
       }
     } else {
@@ -269,7 +249,7 @@ exports.likeDislike = async (req, res, next) => {
           });
         } catch (error) {
           res.status(400).json({
-            error: "cette sauce éxiste pas",
+            error: "cette sauce n'éxiste pas",
           });
         }
       }
@@ -299,12 +279,12 @@ exports.likeDislike = async (req, res, next) => {
       }
     } catch (error) {
       res.status(400).json({
-        error: "cette sauce éxiste pas",
+        error: "cette sauce n'éxiste pas",
       });
     }
   } else {
     res.status(400).json({
-      error: "cette sauce éxiste pas",
+      error: "cette sauce n'éxiste pas",
     });
   }
 };
