@@ -51,7 +51,7 @@ exports.modifyThing = async (req, res, next) => {
               _id: req.params.id,
             }).then((sauce) => {
               const filename = sauce.imageUrl.split("/images/")[1];
-              fs.unlinkSync(`images/${filename}`);
+              fs.unlinkSync(`images/${filename}`, () => res.status(200).json({ message: "ancienne image supprimée!" }));
             }),
             {
               ...JSON.parse(req.body.sauce),
