@@ -16,6 +16,8 @@ schema
   .has()
   .digits(2) // Avoir au minimum 2 chiffres
   .has()
+  .symbols() // Avoir au minimum 1 caractère spécial
+  .has()
   .not()
   .spaces() // Pas d'espace
   .is()

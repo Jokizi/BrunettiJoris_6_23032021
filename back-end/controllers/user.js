@@ -11,9 +11,10 @@ const motDePasse = "l5JmP+G0/1zB%;r8B8?2?2pcqGcL^3";
 
 exports.signup = (req, res, next) => {
   // On crypte notre texte
-  let cipher = crypto.createCipheriv(algorithm, motDePasse);
+  let cipher = crypto.createCipher(algorithm, motDePasse);
 
   let crypted = cipher.update(req.body.email, "utf8", "hex");
+
   crypted += cipher.final("hex");
 
   bcrypt
@@ -32,12 +33,12 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  let cipher = crypto.createCipheriv(algorithm, motDePasse);
+  let cipher = crypto.createCipher(algorithm, motDePasse);
 
   let crypted = cipher.update(req.body.email, "utf8", "hex");
   crypted += cipher.final("hex");
 
-  let decipher = crypto.createDecipheriv(algorithm, motDePasse);
+  let decipher = crypto.createDecipher(algorithm, motDePasse);
   let dec = decipher.update(crypted, "hex", "utf8");
   dec += decipher.final("utf8");
 
